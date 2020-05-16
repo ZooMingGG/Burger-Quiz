@@ -17,14 +17,17 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
     const test = () => {
         const showQuestions = () => {
+            const name = 'Стандарт';
+            const src = './image/burger.png';
+        
             questionTitle.textContent = 'Якого кольору бургер ви хочете?';
 
             answersForm.innerHTML = `
             <div class="answers-item d-flex flex-column">
                 <input type="radio" id="answerItem1" name="answer" class="d-none">
                 <label for="answerItem1" class="d-flex flex-column justify-content-between">
-                    <img class="answerImg" src="./image/burger.png" alt="burger">
-                    <span>Стандарт</span>
+                    <img class="answerImg" src="${src}" alt="burger">
+                    <span>${name}</span>
                 </label>
             </div>
             <div class="answers-item d-flex justify-content-center">
