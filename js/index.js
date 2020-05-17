@@ -2,6 +2,7 @@
 document.addEventListener('DOMContentLoaded', function(event) {
     const startBtn = document.querySelector('#btnOpenModal');
     const modalWindow = document.querySelector('#modalBlock');
+    const modalDialog = document.querySelector('.modal-dialog');
     const closeModalBtn = document.querySelector('#closeModal');
     const questionTitle = document.querySelector('#question');
     const answersForm = document.querySelector('#formAnswers');
@@ -96,8 +97,27 @@ document.addEventListener('DOMContentLoaded', function(event) {
         }
     ];
 
+
+    let count = -100;
+
+    modalDialog.style.top = count;
+
+    const animateModal = function() {
+        modalDialog.style.top = count + '%';
+        count += 4;
+        
+        if (count < 0) {
+            requestAnimationFrame(animateModal);
+        } else {
+            count = -100;
+        }
+    };
+
     startBtn.addEventListener('click', () => {
+        requestAnimationFrame(animateModal);
+
         modalWindow.classList.add('d-block');
+
         test();
     });
 
@@ -112,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
             questions[index].answers.forEach((answer) => {
                 const answerItem = document.createElement('div');
 
-                answerItem.classList.add('answers-item', 'd-flex', 'flex-column');
+                answerItem.classList.add('answers-item', 'd-flex', 'justify-content-center');
 
                 answerItem.innerHTML = `
                 <input type="${questions[index].type}" id="${answer.id}" name="answer" class="d-none">
