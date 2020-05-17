@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
     const answersForm = document.querySelector('#formAnswers');
     const nextBtn = document.querySelector('#next');
     const prevBtn = document.querySelector('#prev');
+    const sendBtn = document.querySelector('#send');
 
 
     const questions = [
@@ -126,6 +127,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
     });
 
     const test = () => {
+        const finalAnswers = [];
         let numberQuestion = 0;
 
         const showAnswers = (index) => {
@@ -135,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                 answerItem.classList.add('answers-item', 'd-flex', 'justify-content-center');
 
                 answerItem.innerHTML = `
-                <input type="${questions[index].type}" id="${answer.id}" name="answer" class="d-none">
+                <input type="${questions[index].type}" id="${answer.id}" name="answer" class="d-none" value="${answer.title}">
                 <label for="${answer.id}" class="d-flex flex-column justify-content-between">
                     <img class="answerImg" src="${answer.src}" alt="burger">
                     <span>${answer.title}</span>
@@ -147,33 +149,81 @@ document.addEventListener('DOMContentLoaded', function(event) {
         };
 
         const showQuestions = (index) => {
-            if (numberQuestion === 0) {
-                prevBtn.classList.add('hidden');
-            } else {
-                prevBtn.classList.remove('hidden');
-            }
-
-            if (numberQuestion === questions.length - 1) {
-                nextBtn.classList.add('hidden');
-            } else {
-                nextBtn.classList.remove('hidden');
-            }
-
             answersForm.innerHTML = '';
 
-            questionTitle.textContent = `${questions[index].question}`;
+            if (numberQuestion >= 0 && numberQuestion <= questions.length - 1) {
+                questionTitle.textContent = `${questions[index].question}`;
 
-            showAnswers(index);
+                showAnswers(index);
+
+                nextBtn.classList.remove('hidden');
+                prevBtn.classList.remove('hidden');
+                sendBtn.classList.remove('d-block');
+            }
+
+            if (numberQuestion === 0) {
+                prevBtn.classList.add('hidden');
+            } 
+
+            if (numberQuestion === questions.length) {
+                nextBtn.classList.add('hidden');
+                prevBtn.classList.add('hidden');
+                sendBtn.classList.add('d-block');
+
+                questionTitle.textContent = '';
+
+                answersForm.innerHTML = `
+                <div class="form-group">
+                    <label for="numberPhone">Введіть свій номер тлефону</label>
+                    <input type="phone" class="form-control" id="numberPhone">
+                </div>
+                `;
+            }
+
+            if (numberQuestion === questions.length + 1) {
+                questionTitle.textContent = '';
+                answersForm.textContent = 'Дякуємо за пройдений тест!';
+
+                sendBtn.classList.remove('d-block');
+
+                setTimeout( () => {
+                    modalWindow.classList.remove('d-block');
+                }, 2000);
+            }
         };
 
         showQuestions(numberQuestion);
 
+        const checkAnswer = () => {
+            const obj = {};
+
+            const inputs = [...answersForm.elements].filter((input) => input.checked || input.id === 'numberPhone');
+
+            inputs.forEach((input, index) => {
+                if (numberQuestion >= 0 && numberQuestion <= questions.length - 1) {
+                    obj[`${index}_${questions[numberQuestion].question}`] = input.value;
+                }
+
+                if (numberQuestion === questions.length) {
+                    obj[`Номер телефону`] = input.value;
+                }
+            });
+
+            finalAnswers[numberQuestion] = obj;
+        };
+
         nextBtn.onclick = () => {
+            checkAnswer();
             showQuestions(++numberQuestion);
         };
 
         prevBtn.onclick = () => {
             showQuestions(--numberQuestion);
+        };
+
+        sendBtn.onclick = () => {
+            checkAnswer();
+            showQuestions(++numberQuestion);
         };
     };
 });
