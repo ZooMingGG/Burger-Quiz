@@ -108,8 +108,6 @@ document.addEventListener('DOMContentLoaded', function(event) {
     const test = () => {
         let numberQuestion = 0;
 
-        prevBtn.classList.add('hidden');
-
         const showAnswers = (index) => {
             questions[index].answers.forEach((answer) => {
                 const answerItem = document.createElement('div');
@@ -129,6 +127,18 @@ document.addEventListener('DOMContentLoaded', function(event) {
         };
 
         const showQuestions = (index) => {
+            if (numberQuestion === 0) {
+                prevBtn.classList.add('hidden');
+            } else {
+                prevBtn.classList.remove('hidden');
+            }
+
+            if (numberQuestion === questions.length - 1) {
+                nextBtn.classList.add('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+            }
+
             answersForm.innerHTML = '';
 
             questionTitle.textContent = `${questions[index].question}`;
@@ -140,22 +150,10 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
         nextBtn.onclick = () => {
             showQuestions(++numberQuestion);
-
-            if (numberQuestion === questions.length - 1) {
-                nextBtn.classList.add('hidden');
-            } 
-
-            prevBtn.classList.remove('hidden');
         };
 
         prevBtn.onclick = () => {
             showQuestions(--numberQuestion);
-
-            if (numberQuestion === 0) {
-                prevBtn.classList.add('hidden');
-            }
-
-            nextBtn.classList.remove('hidden');
         };
     };
 });
