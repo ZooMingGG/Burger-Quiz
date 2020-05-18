@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
     const startBtn = document.querySelector('#btnOpenModal');
     const modalWindow = document.querySelector('#modalBlock');
     const modalDialog = document.querySelector('.modal-dialog');
+    const modalTitle = document.querySelector('.modal-title');
     const closeModalBtn = document.querySelector('#closeModal');
     const questionTitle = document.querySelector('#question');
     const answersForm = document.querySelector('#formAnswers');
@@ -10,94 +11,31 @@ document.addEventListener('DOMContentLoaded', function(event) {
     const prevBtn = document.querySelector('#prev');
     const sendBtn = document.querySelector('#send');
 
+    const firebaseConfig = {
+        apiKey: "AIzaSyCYr7Ukw286SE41-usHowBUEoythMKndOs",
+        authDomain: "burger-quiz-6049f.firebaseapp.com",
+        databaseURL: "https://burger-quiz-6049f.firebaseio.com",
+        projectId: "burger-quiz-6049f",
+        storageBucket: "burger-quiz-6049f.appspot.com",
+        messagingSenderId: "312052132550",
+        appId: "1:312052132550:web:42cac09cd318f06f1f85c7",
+        measurementId: "G-QG3CPQ9RDF"
+    };
+  
+    firebase.initializeApp(firebaseConfig);
 
-    const questions = [
-        {
-            question: "Якого кольору  бургер?",
-            answers: [
-                {
-                    id: 'standart',
-                    title: 'Стандарт',
-                    src: './image/burger.png'
-                },
-                {   
-                    id: 'black',
-                    title: 'Чорний',
-                    src: './image/burgerBlack.png'
-                }
-            ],
-            type: 'radio'
-        },
-        {
-            question: "З якого м'яса котлета?",
-            answers: [
-                {
-                    id: 'chicken',
-                    title: 'Курка',
-                    src: './image/chickenMeat.png'
-                },
-                {
-                    id: 'beef',
-                    title: 'Яловичина',
-                    src: './image/beefMeat.png'
-                },
-                {
-                    id: 'pork',
-                    title: 'Свинина',
-                    src: './image/porkMeat.png'
-                }
-            ],
-            type: 'radio'
-        },
-        {
-            question: "Додаткові інгредієнти?",
-            answers: [
-                {
-                    id: 'tomato',
-                    title: 'Помідор',
-                    src: './image/tomato.png'
-                },
-                {
-                    id: 'cucumber',
-                    title: 'Огірок',
-                    src: './image/cucumber.png'
-                },
-                {
-                    id: 'cabbage',
-                    title: 'Салат',
-                    src: './image/salad.png'
-                },
-                {
-                    id: 'onion',
-                    title: 'Цибуля',
-                    src: './image/onion.png'
-                }
-            ],
-            type: 'checkbox'
-        },
-        {
-            question: "Добавити соус?",
-            answers: [
-                {
-                    id: 'garlic sauce',
-                    title: 'Часниковий',
-                    src: './image/sauce1.png'
-                },
-                {
-                    id: 'tomato sauce',
-                    title: 'Томатний',
-                    src: './image/sauce2.png'
-                },
-                {
-                    id: 'mustard sauce',
-                    title: 'Гірчичний',
-                    src: './image/sauce3.png'
-                }
-            ],
-            type: 'radio'
-        }
-    ];
+    const getData = () => {
+        answersForm.textContent = 'LOAD';
 
+        questionTitle.textContent = '';
+        modalTitle.textContent = '';
+
+        nextBtn.classList.add('hidden');
+        prevBtn.classList.add('hidden');
+
+        firebase.database().ref().child('questions').once('value')
+            .then(snap => test(snap.val()));
+    };
 
     let count = -100;
 
@@ -119,16 +57,18 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
         modalWindow.classList.add('d-block');
 
-        test();
+        getData();
     });
 
     closeModalBtn.addEventListener('click', () => {
         modalWindow.classList.remove('d-block');
     });
 
-    const test = () => {
+    const test = (questions) => {
         const finalAnswers = [];
         let numberQuestion = 0;
+
+        modalTitle.textContent = 'Дайте відповідь на питання:';
 
         const showAnswers = (index) => {
             questions[index].answers.forEach((answer) => {
@@ -171,6 +111,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                 sendBtn.classList.add('d-block');
 
                 questionTitle.textContent = '';
+                modalTitle.textContent = '';
 
                 answersForm.innerHTML = `
                 <div class="form-group">
@@ -178,6 +119,12 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     <input type="phone" class="form-control" id="numberPhone">
                 </div>
                 `;
+
+                const phoneNumber = document.querySelector('#numberPhone');
+
+                phoneNumber.addEventListener('input', (event) => {
+                    event.target.value = event.target.value.replace(/[^0-9+-]/, '');
+                });
             }
 
             if (numberQuestion === questions.length + 1) {
@@ -224,7 +171,14 @@ document.addEventListener('DOMContentLoaded', function(event) {
         sendBtn.onclick = () => {
             checkAnswer();
             showQuestions(++numberQuestion);
+
+            firebase
+            .database()
+            .ref()
+            .child('contacts')
+            .push(finalAnswers);
+
+            console.log(finalAnswers);
         };
     };
 });
-
